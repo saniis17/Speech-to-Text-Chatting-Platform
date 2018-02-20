@@ -34,7 +34,7 @@
 	
 	$ node speech-to-text.js
 	
-	If not works, then type:
+	If not works, then try:
 	
 	$ nodejs speech-to-text.js
 
