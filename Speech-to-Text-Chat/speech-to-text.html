@@ -1,0 +1,165 @@
+<script src="/socket.io/socket.io.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script>
+  
+var final_transcript = '';
+var recognizing = false;
+var ignore_onend;
+
+if (!('webkitSpeechRecognition' in window)) {
+  alert("Speech Recogniztion API Not Supported");} 
+else {
+  var recognizer = new webkitSpeechRecognition();
+// Recogniser doesn't stop listening even if the user pauses
+  recognizer.continuous = true;
+  recognizer.interimResults = true;
+  recognizer.lang = 'en-IN';
+  recognizer.onstart = function() {
+  recognizing = true;
+  };
+
+recognizer.onerror = function(event) {
+    if (event.error == 'no-speech') {
+      console.log('No speech was detected. You may need to adjust your microphone settings.');
+      ignore_onend = true;
+    }
+    if (event.error == 'audio-capture') {
+      console.log('No microphone was found. Ensure that a microphone is installed and that microphone settings are configured correctly.');
+      ignore_onend = true;
+    }
+    if (event.error == 'not-allowed') {
+      if (event.timeStamp - start_timestamp < 100) {
+        console.log('Permission to use microphone is blocked. To change, go to chrome://settings/contentExceptions#media-stream');
+      } else {
+        console.log('Permission to use microphone was denied.');
+      }
+      ignore_onend = true;
+    }
+};
+
+recognizer.onend = function() {
+    recognizing = false;
+    if (ignore_onend) {
+      return;
+    }
+    if (!final_transcript) {
+      console.log('Click on the microphone icon and begin speaking for as long as you like.');
+      return;
+    }
+};
+
+recognizer.onresult = function(event) {
+    var interim_transcript = '';
+    if (typeof(event.results) == 'undefined') {
+      recognizer.onend = null;
+      recognizer.stop();
+      return;
+    }	
+    for (var i = event.resultIndex; i < event.results.length; ++i) {
+      if (event.results[i].isFinal){
+        transcript += event.results[i][0].transcript;
+	}
+      else {
+        interim_transcript += event.results[i][0].transcript;}
+    }
+    transcript = capitalize(transcript);
+    final_span = linebreak(transcript);	
+    interim_span = linebreak(interim_transcript);
+
+document.getElementById('data').value =  final_span + interim_span;
+final_transcript = final_span + interim_span;
+  };
+
+}
+
+function start(event) {
+    if (!(recognizing)) {recognizer.start(); }
+    final_transcript = '';
+    transcript = '';
+    ignore_onend = false;
+    final_span = '';
+    interim_span = '';
+    document.getElementById('data').value = '';
+}
+
+var two_line = /\n\n/g;
+var one_line = /\n/g;
+function linebreak(s) {
+    return s.replace(two_line, '<p></p>').replace(one_line, '<br>');
+}
+
+
+var first_char = /\S/;
+function capitalize(s) {
+    var str = s.replace(first_char, function(m) { return m.toUpperCase(); });
+    if (str.replace(/\s/g, '').length){ str = str.replace('$',''); return str+'$';}
+    return str;
+}
+
+var socket = io(); 
+
+  // on connection to server, ask for user's name with an anonymous callback
+socket.on('connect', function(){
+    // call the server-side function 'adduser' and send one parameter (value of prompt)
+    socket.emit('adduser', prompt("What's your name?"));
+start(event);
+   });
+
+  // listener, whenever the server emits 'updatechat', this updates the chat body
+socket.on('updatechat', function (username, data) {
+    $('#conversation').append('<b>'+username + ':</b> ' + data + '<br>');
+   });
+
+  // listener, whenever the server emits 'updateusers', this updates the username list
+socket.on('updateusers', function(data) {
+    $('#users').empty();
+    $.each(data, function(key, value) {
+      $('#users').append('<div>' + key + '</div>');
+   });
+});
+
+function myFunction() {
+   var newDate = new Date().toLocaleString();
+   var message = document.getElementById('data').value;
+   while(message.substr(message.length - 1) != '$'){
+	recognition.onresult = function(event) {
+	   var lastfinal = event.results[0][0].transcript;}
+	message = capitalize(lastfinal);
+}
+   message = message.replace('$','');
+   socket.emit('sendchat', message);
+   start(event);
+}
+  
+// on load of page
+  $(function(){
+    // when the client clicks SEND
+    $('#datasend').click( function() {
+      myFunction();
+    });
+
+    // when the client hits ENTER on their keyboard
+    $('#data').keypress(function(e) {
+      if(e.which == 13) {
+        $(this).blur();
+        $('#datasend').focus().click();
+      }
+    });
+  });
+
+function sleep(miliseconds) {
+   var currentTime = new Date().getTime();
+   while (currentTime + miliseconds >= new Date().getTime()) {
+  }
+}
+
+</script>
+<div style="float:left;width:200px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
+  <b>USERS</b>
+  <div id="users"></div>
+</div>
+<div style="float:left;width:700px;height:250px;overflow:scroll-y;padding:30px;">
+  <div id="conversation"></div>
+  <textarea id="data" style="resize:none" cols="120" rows="5"></textarea>
+  <input type="button" id="datasend" value="send" style="height:30px;width:70px" />
+</div>

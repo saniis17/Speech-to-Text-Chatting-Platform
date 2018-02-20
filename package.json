@@ -1,0 +1,12 @@
+{
+  "name": "Speech-to-Text-Chat",
+  "version": "0.0.1",
+  "description": "Speech-to-Text chat application with socket.io",
+  "dependencies": {
+    "express": "^4.15.2",
+    "socket.io": "^1.7.3"
+  },
+  "scripts": {
+    "start": "node speech-to-text.js"
+  }
+}
