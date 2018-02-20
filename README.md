@@ -1,6 +1,5 @@
 # Speech-to-Text-Chatting-Platform
-1. Install NodeJS and npm; in Ubuntu 16.04:
-
+1. Install NodeJS and npm; in Ubuntu 14.04/16.04:
 	$ sudo apt-get update
 	
 	$ sudo apt-get install nodejs
