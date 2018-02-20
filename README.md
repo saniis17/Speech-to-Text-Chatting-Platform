@@ -1,5 +1,6 @@
 # Speech-to-Text-Chatting-Platform
 1. Install NodeJS and npm; in Ubuntu 14.04/16.04:
+
 	$ sudo apt-get update
 	
 	$ sudo apt-get install nodejs
@@ -10,8 +11,12 @@
    
 	$ nodejs -v
 
-2. Execute below command to create the node_modules folder from package.json.
+2. Change terminal-home-directory to Speech-to-Text-Chatting-Platform-master. 
 
+	$ cd Speech-to-Text-Chatting-Platform-master
+	
+	Now, Execute below command to create the node_modules folder from package.json. 
+	
 	$ npm install -d
 
 3. Execute below command to create certificate:
@@ -29,6 +34,9 @@
 	
 	$ node speech-to-text.js
 	
+	If not works, then type:
+	
+	$ nodejs speech-to-text.js
 
 5. Start client app on Google Chrome by typing:
 
