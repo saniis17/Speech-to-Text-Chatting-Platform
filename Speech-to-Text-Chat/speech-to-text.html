@@ -1,3 +1,16 @@
+<!doctype html>
+<html lang="en"> 
+ <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>Speech to Text Chatting Platform</title>
+  </head>
+<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script>
@@ -7,7 +20,8 @@ var recognizing = false;
 var ignore_onend;
 
 if (!('webkitSpeechRecognition' in window)) {
-  alert("Speech Recogniztion API Not Supported");} 
+  alert("Speech Recogniztion API Not Supported");
+} 
 else {
   var recognizer = new webkitSpeechRecognition();
 // Recogniser doesn't stop listening even if the user pauses
@@ -69,7 +83,6 @@ recognizer.onresult = function(event) {
 document.getElementById('data').value =  final_span + interim_span;
 final_transcript = final_span + interim_span;
   };
-
 }
 
 function start(event) {
@@ -123,9 +136,8 @@ function myFunction() {
    var message = document.getElementById('data').value;
    while(message.substr(message.length - 1) != '$'){
 	recognition.onresult = function(event) {
-	   var lastfinal = event.results[0][0].transcript;}
-	message = capitalize(lastfinal);
-}
+	   var lastfinal = event.results[0][0].transcript; }
+	message = capitalize(lastfinal); }
    message = message.replace('$','');
    socket.emit('sendchat', message);
    start(event);
@@ -142,16 +154,9 @@ function myFunction() {
     $('#data').keypress(function(e) {
       if(e.which == 13) {
         $(this).blur();
-        $('#datasend').focus().click();
-      }
+        $('#datasend').focus().click(); }
     });
   });
-
-function sleep(miliseconds) {
-   var currentTime = new Date().getTime();
-   while (currentTime + miliseconds >= new Date().getTime()) {
-  }
-}
 
 </script>
 <div style="float:left;width:200px;border-right:1px solid black;height:300px;padding:10px;overflow:scroll-y;">
@@ -160,6 +165,7 @@ function sleep(miliseconds) {
 </div>
 <div style="float:left;width:700px;height:250px;overflow:scroll-y;padding:30px;">
   <div id="conversation"></div>
-  <textarea id="data" style="resize:none" cols="120" rows="5"></textarea>
-  <input type="button" id="datasend" value="send" style="height:30px;width:70px" />
+  <textarea id="data" style="resize:none" cols="100" rows="5"></textarea>
+  <input type="button" id="datasend" value="Send" style="height:35px;width:80px; background-color: #4CAF50; color: white; text-align: center; text-decoration: none; display: inline-block; font-size: 18px; margin: 4px 4px; cursor: pointer;"/>
 </div>
+</html>
