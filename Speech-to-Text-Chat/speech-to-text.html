@@ -15,7 +15,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script>
   
-var final_transcript = '';
 var recognizing = false;
 var ignore_onend;
 
@@ -56,13 +55,14 @@ recognizer.onend = function() {
     if (ignore_onend) {
       return;
     }
-    if (!final_transcript) {
+    if (!(final_span + interim_span)) {
       console.log('Click on the microphone icon and begin speaking for as long as you like.');
       return;
     }
 };
 
 recognizer.onresult = function(event) {
+
     var interim_transcript = '';
     if (typeof(event.results) == 'undefined') {
       recognizer.onend = null;
@@ -74,20 +74,24 @@ recognizer.onresult = function(event) {
         transcript += event.results[i][0].transcript;
 	}
       else {
-        interim_transcript += event.results[i][0].transcript;}
+        interim_transcript += event.results[i][0].transcript; }
     }
+
     transcript = capitalize(transcript);
     final_span = linebreak(transcript);	
     interim_span = linebreak(interim_transcript);
-
-document.getElementById('data').value =  final_span + interim_span;
-final_transcript = final_span + interim_span;
+if(!final_span && interim_span.length > 1 ){
+document.getElementById("datasend").style.backgroundColor = "#A9A9A9";
+document.getElementById("datasend").disabled = true;}
+else{
+document.getElementById("datasend").style.backgroundColor = "#4CAF50";
+document.getElementById("datasend").disabled = false;}
+document.getElementById('data').value = final_span + interim_span;
   };
 }
 
 function start(event) {
     if (!(recognizing)) {recognizer.start(); }
-    final_transcript = '';
     transcript = '';
     ignore_onend = false;
     final_span = '';
@@ -105,7 +109,6 @@ function linebreak(s) {
 var first_char = /\S/;
 function capitalize(s) {
     var str = s.replace(first_char, function(m) { return m.toUpperCase(); });
-    if (str.replace(/\s/g, '').length){ str = str.replace('$',''); return str+'$';}
     return str;
 }
 
@@ -134,28 +137,24 @@ socket.on('updateusers', function(data) {
 function myFunction() {
    var newDate = new Date().toLocaleString();
    var message = document.getElementById('data').value;
-   while(message.substr(message.length - 1) != '$'){
-	recognition.onresult = function(event) {
-	   var lastfinal = event.results[0][0].transcript; }
-	message = capitalize(lastfinal); }
-   message = message.replace('$','');
-   socket.emit('sendchat', message);
+
+if(message){
+   socket.emit('sendchat', message);}
    start(event);
 }
-  
+ 
 // on load of page
   $(function(){
-    // when the client clicks SEND
-    $('#datasend').click( function() {
-      myFunction();
-    });
-
-    // when the client hits ENTER on their keyboard
-    $('#data').keypress(function(e) {
-      if(e.which == 13) {
-        $(this).blur();
-        $('#datasend').focus().click(); }
-    });
+    	// when the client clicks SEND
+	$('#datasend').click( function() {
+	   myFunction();
+	});
+	// when the client hits ENTER on their keyboard
+	$("#data").keyup(function(event){
+	    if(event.keyCode == 13){
+		$("#datasend").click();
+	    }
+	});
   });
 
 </script>
