@@ -20,6 +20,8 @@
 	$ npm install -d
 
 3. Execute below command to create certificate:
+	
+	$ cd Speech-to-Text-Chat
 
 	$ openssl genrsa -out server-key.pem 1024
 	
@@ -29,8 +31,6 @@
 	
 
 4. Run the program:
-
-	$ cd Speech-to-Text-Chat
 	
 	$ node speech-to-text.js
 	
